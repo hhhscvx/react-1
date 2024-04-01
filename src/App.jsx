@@ -5,8 +5,10 @@ import Header from "./components/Header/Header";
 import JournalItem from "./components/JournalItem/JournalItem";
 import JournalList from "./components/JournalList/JournalList";
 import JournalAddButton from "./components/JournalAddButton/JournalAddButton";
+import JournalForm from "./components/JournalForm/JournalForm";
 import Body from "./layouts/Body/Body";
 import LeftPanel from "./layouts/leftPanel/LeftPanel";
+
 
 function App() {
   const data = [
@@ -48,10 +50,10 @@ function App() {
         </JournalList>
       </LeftPanel>
       <Body>
-        Body
-        <Button />
+        <JournalForm>
+
+        </JournalForm>
       </Body>
-      <p>Paragraph</p>
     </div>
   );
 }

@@ -2,9 +2,7 @@ import "./Header.css";
 
 function Header({ children }) {
   return (
-    <>
-      Logo
-    </>
+    <img src="/logo.svg" alt="Personal Journal" className="logo" />
   );
 }
 
