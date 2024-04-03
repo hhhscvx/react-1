@@ -1,8 +1,5 @@
 import "./App.css";
-import Button from "./components/Button/Button";
-import CardButton from "./components/CardButton/CardButton";
 import Header from "./components/Header/Header";
-import JournalItem from "./components/JournalItem/JournalItem";
 import JournalList from "./components/JournalList/JournalList";
 import JournalAddButton from "./components/JournalAddButton/JournalAddButton";
 import JournalForm from "./components/JournalForm/JournalForm";
@@ -11,16 +8,16 @@ import LeftPanel from "./layouts/leftPanel/LeftPanel";
 import { useState } from "react";
 
 const INITIAL_DATA = [
-  {
-    title: "Подготовка к обновлению курсов",
-    text: "Горные походы открывают удивительные природные ландшафт",
-    date: new Date(),
-  },
-  {
-    title: "Поход в годы",
-    text: "Думал, что очень много времени",
-    date: new Date(),
-  },
+  // {
+  //   title: "Подготовка к обновлению курсов",
+  //   text: "Горные походы открывают удивительные природные ландшафт",
+  //   date: new Date(),
+  // },
+  // {
+  //   title: "Поход в годы",
+  //   text: "Думал, что очень много времени",
+  //   date: new Date(),
+  // },
 ];
 
 function App() {
@@ -30,9 +27,11 @@ function App() {
     setItems((oldItems) => [
       ...oldItems, // создаем новый массив со всеми старыми items + новым item
       {
-        text: item.text,
+        text: item.post,
         title: item.title,
-        date: new Date(item.date)
+        date: new Date(item.date),
+        id:
+          oldItems.length > 0 ? Math.max(...oldItems.map((i) => i.id)) + 1 : 1, // берем максимальный id из item`ов списка и прибавляем 1 (новый элемент)
       },
     ]);
   };
@@ -44,14 +43,7 @@ function App() {
 
         <JournalAddButton></JournalAddButton>
 
-        <JournalList>
-          {/* {[<Button>1</Button>, <Button>2</Button>]} */}
-          {items.map((el) => (
-            <CardButton>
-              <JournalItem title={el.title} text={el.text} date={el.date} />
-            </CardButton>
-          ))}
-        </JournalList>
+        <JournalList items={items}></JournalList>
       </LeftPanel>
       <Body>
         <JournalForm onSubmit={addItem}></JournalForm>{" "}

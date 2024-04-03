@@ -1,5 +1,4 @@
 import "./JournalItem.css";
-import CardButton from "./../CardButton/CardButton";
 
 function JournalItem({ title, date, text }) {
   const prettyDate = new Intl.DateTimeFormat("ru-RU").format(date);
