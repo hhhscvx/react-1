@@ -1,6 +1,7 @@
 import { useState } from "react";
 import Button from "../Button/Button";
-import "./JournalForm.css";
+import styles from "./JournalForm.module.css";
+import clsnames from "classnames";
 
 function JournalForm({ onSubmit }) {
   const [formValidState, setFormValidState] = useState({
@@ -40,17 +41,61 @@ function JournalForm({ onSubmit }) {
   };
 
   return (
-    <form className="journal-form" onSubmit={addJournalItem}>
-      <input type="text" name="title" style={{border: formValidState.title ? undefined : '1px solid red'}} />
-      <input type="date" name="date" style={{border: formValidState.date ? undefined : '1px solid red'}} />
-      <input type="text" name="tag" />
-      <textarea name="post" id="" cols="30" rows="10" style={{border: formValidState.post ? undefined : '1px solid red'}}></textarea>
-      <Button
-        text="Сохранить"
-        onClick={() => {
-          console.log("Clicked");
+    <form className={styles["journal-form"]} onSubmit={addJournalItem}>
+      <div className="divForm">
+        <input
+          type="text"
+          name="title"
+          className={clsnames(styles["input"], styles["title"], {
+            [styles["invalid"]]: !formValidState.title, // Если не title, то styles['invalid']
+          })}
+        />
+        <img src="/archive.svg" alt="Date" />
+      </div>
+
+      <div
+        className="divForm"
+        style={{
+          display: "flex",
+          alignItems: "center",
+          borderBottom: "3px solid #323232",
+          paddingBottom: "10px",
         }}
-      />
+      >
+        <img src="/calendar.svg" alt="Date" />
+        <label style={{ marginRight: "10px", marginLeft: "20px" }}>Дата</label>
+        <input
+          type="date"
+          name="date"
+          className={`${styles["input"]} ${styles["no-title"]} ${
+            formValidState.date ? "" : styles.invalid
+          }`}
+        />
+      </div>
+
+      <div
+        className="divForm"
+        style={{
+          display: "flex",
+          alignItems: "center",
+          borderBottom: "3px solid #323232",
+          paddingBottom: "10px",
+        }}
+      >
+        <img src="/folder.svg" alt="Date" />
+        <label style={{ marginRight: "10px", marginLeft: "20px" }}>Метки</label>
+        <input type="text" name="tag" className={`${styles["no-title"]}`} />
+      </div>
+      <textarea
+        name="post"
+        id=""
+        cols="30"
+        rows="10"
+        className={`${styles["input"]} ${
+          formValidState.post ? "" : styles.invalid
+        }`}
+      ></textarea>
+      <Button text="Сохранить" />
     </form>
   );
 }
