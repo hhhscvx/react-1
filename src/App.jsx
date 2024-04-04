@@ -5,23 +5,32 @@ import JournalAddButton from "./components/JournalAddButton/JournalAddButton";
 import JournalForm from "./components/JournalForm/JournalForm";
 import Body from "./layouts/Body/Body";
 import LeftPanel from "./layouts/leftPanel/LeftPanel";
-import { useState } from "react";
-
-const INITIAL_DATA = [
-  // {
-  //   title: "Подготовка к обновлению курсов",
-  //   text: "Горные походы открывают удивительные природные ландшафт",
-  //   date: new Date(),
-  // },
-  // {
-  //   title: "Поход в годы",
-  //   text: "Думал, что очень много времени",
-  //   date: new Date(),
-  // },
-];
+import { useEffect, useState } from "react";
 
 function App() {
-  const [items, setItems] = useState(INITIAL_DATA);
+  const [items, setItems] = useState([]);
+
+  useEffect(() => {
+    // сработает только один раз т.к. передан пустой массив
+    const data = JSON.parse(localStorage.getItem("data"));
+    if (data) {
+      setItems(
+        // каждый вызов функции ререндерит компонент, а каждый ререндер ререндерит компонент и т.д. до бесконечности. На помощь приходит useEffect
+        data.map((item) => ({
+          ...item,
+          date: new Date(item.date),
+        }))
+      );
+    }
+  }, []);
+  // Пустой массив зависимостей указывает, что useEffect не зависит от изменений каких-либо переменных или
+  // состояний, и должен быть вызван только при первом рендере компонента (монтировании).
+
+  useEffect(() => {
+    if (items.length) {
+      localStorage.setItem("data", JSON.stringify(items));
+    }
+  }, [items]);
 
   const addItem = (item) => {
     setItems((oldItems) => [

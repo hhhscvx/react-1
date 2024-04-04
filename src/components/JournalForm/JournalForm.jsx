@@ -1,14 +1,30 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Button from "../Button/Button";
 import styles from "./JournalForm.module.css";
 import clsnames from "classnames";
 
+const INITIAL_STATE = {
+  title: true,
+  post: true,
+  date: true,
+};
+
 function JournalForm({ onSubmit }) {
-  const [formValidState, setFormValidState] = useState({
-    title: true,
-    post: true,
-    date: true,
-  });
+  const [formValidState, setFormValidState] = useState(INITIAL_STATE);
+
+  useEffect(() => {
+    let timerId;
+    if (!formValidState.date || !formValidState.post || !formValidState.title) {
+      timerId = setTimeout(() => {
+        // Если хоть одно поле не проходит валидацию то оно становится красным, затем спустя две секунды вновь возвращается к нормальному
+        setFormValidState(INITIAL_STATE);
+      }, 2000);
+    }
+    return () => {
+      console.log("Вызван return");
+      clearTimeout(timerId); // каждый клик очищается предыдущий таймер 
+    };
+  }, [formValidState]);
 
   const addJournalItem = (event) => {
     event.preventDefault();
