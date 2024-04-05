@@ -1,70 +1,83 @@
-import { useEffect, useState } from "react";
+import { useEffect, useReducer, useRef } from "react";
 import Button from "../Button/Button";
 import styles from "./JournalForm.module.css";
 import clsnames from "classnames";
-
-const INITIAL_STATE = {
-  title: true,
-  post: true,
-  date: true,
-};
+import { INITIAL_STATE, formReducer } from "./JournalForm.state";
+import Input from "../Input/Input";
 
 function JournalForm({ onSubmit }) {
-  const [formValidState, setFormValidState] = useState(INITIAL_STATE);
+  const [formState, dispatchForm] = useReducer(formReducer, INITIAL_STATE);
+  const { isValid, isFormReadyToSubmit, values } = formState;
+  const titleRef = useRef(); // useRef позволяет привязаться к определенному элементу
+  const dateRef = useRef();
+  const postRef = useRef();
+
+  const focusError = (isValid) => {
+    switch (true) {
+      case !isValid.title:
+        titleRef.current.focus(); // current - это ссылка на тот объект, на который реферится titleRef
+        break;
+      case !isValid.date:
+        dateRef.current.focus();
+        break;
+      case !isValid.post:
+        postRef.current.focus();
+        break;
+    }
+  };
 
   useEffect(() => {
     let timerId;
-    if (!formValidState.date || !formValidState.post || !formValidState.title) {
+    if (!isValid.date || !isValid.post || !isValid.title) {
+      focusError(isValid);
       timerId = setTimeout(() => {
         // Если хоть одно поле не проходит валидацию то оно становится красным, затем спустя две секунды вновь возвращается к нормальному
-        setFormValidState(INITIAL_STATE);
+        dispatchForm({ type: "RESET_VALIDITY" });
+        // setFormValidState(INITIAL_STATE);
       }, 2000);
     }
     return () => {
       console.log("Вызван return");
-      clearTimeout(timerId); // каждый клик очищается предыдущий таймер 
+      clearTimeout(timerId); // каждый клик очищается предыдущий таймер
     };
-  }, [formValidState]);
+  }, [isValid]);
+
+  useEffect(() => {
+    if (isFormReadyToSubmit) {
+      onSubmit(values);
+      dispatchForm({ type: "CLEAR" });
+    }
+  }, [isFormReadyToSubmit, values, onSubmit]);
+
+  const onChange = (event) => {
+    dispatchForm({
+      type: "SET_VALUE",
+      payload: { [event.target.name]: event.target.value },
+    });
+    console.log(`formState.values:`);
+    console.log(formState.values);
+    // передаем в payload: <name_of_input>: <value_of_input>
+  };
 
   const addJournalItem = (event) => {
     event.preventDefault();
-
     const formData = new FormData(event.target);
     const formProps = Object.fromEntries(formData); // надо проверить заполнены ли все поля
 
-    let isFormValid = true;
-
-    if (!formProps.title?.trim().length) {
-      // если длина titl`а <= 0
-      setFormValidState((state) => ({ ...state, title: false }));
-      isFormValid = false;
-    } else setFormValidState((state) => ({ ...state, title: true }));
-
-    if (!formProps.post?.trim().length) {
-      setFormValidState((state) => ({ ...state, post: false }));
-      isFormValid = false;
-    } else setFormValidState((state) => ({ ...state, post: true }));
-
-    if (!formProps.date) {
-      setFormValidState((state) => ({ ...state, date: false }));
-      isFormValid = false;
-    } else setFormValidState((state) => ({ ...state, date: true }));
-    if (!isFormValid) {
-      return;
-    }
-
-    onSubmit(formProps); // вызываем добавление нового объекта в items
+    dispatchForm({ type: "SUBMIT", payload: formProps });
   };
 
   return (
     <form className={styles["journal-form"]} onSubmit={addJournalItem}>
       <div className="divForm">
-        <input
+        <Input
           type="text"
+          value={values.title}
+          onChange={onChange}
+          ref={titleRef} // Благодаря forwardRef в компоненте Input присваиваем titleRef к данному инпуту
           name="title"
-          className={clsnames(styles["input"], styles["title"], {
-            [styles["invalid"]]: !formValidState.title, // Если не title, то styles['invalid']
-          })}
+          appearence="title"
+          isValid={isValid.title}
         />
         <img src="/archive.svg" alt="Date" />
       </div>
@@ -80,12 +93,13 @@ function JournalForm({ onSubmit }) {
       >
         <img src="/calendar.svg" alt="Date" />
         <label style={{ marginRight: "10px", marginLeft: "20px" }}>Дата</label>
-        <input
+        <Input
           type="date"
+          value={values.date}
+          onChange={onChange}
+          ref={dateRef}
           name="date"
-          className={`${styles["input"]} ${styles["no-title"]} ${
-            formValidState.date ? "" : styles.invalid
-          }`}
+          isValid={isValid.date}
         />
       </div>
 
@@ -100,16 +114,19 @@ function JournalForm({ onSubmit }) {
       >
         <img src="/folder.svg" alt="Date" />
         <label style={{ marginRight: "10px", marginLeft: "20px" }}>Метки</label>
-        <input type="text" name="tag" className={`${styles["no-title"]}`} />
+        <Input type="text" name="tag" value={values.tag} onChange={onChange} />
       </div>
       <textarea
         name="post"
+        value={values.post}
+        onChange={onChange}
+        ref={postRef}
         id=""
         cols="30"
         rows="10"
-        className={`${styles["input"]} ${
-          formValidState.post ? "" : styles.invalid
-        }`}
+        className={clsnames(styles["input"], {
+          [styles["invalid"]]: !isValid.post,
+        })}
       ></textarea>
       <Button text="Сохранить" />
     </form>
