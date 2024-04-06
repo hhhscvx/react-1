@@ -5,42 +5,28 @@ import JournalAddButton from "./components/JournalAddButton/JournalAddButton";
 import JournalForm from "./components/JournalForm/JournalForm";
 import Body from "./layouts/Body/Body";
 import LeftPanel from "./layouts/leftPanel/LeftPanel";
-import { useEffect, useState } from "react";
+import useLocalStorage from "./hooks/use-localstorage.hook";
+
+function mapItems(items) {
+  if (!items) {
+    return [];
+  }
+  return items.map((el) => ({
+    ...el,
+    date: new Date(el.date),
+  }));
+}
 
 function App() {
-  const [items, setItems] = useState([]);
-
-  useEffect(() => {
-    // сработает только один раз т.к. передан пустой массив
-    const data = JSON.parse(localStorage.getItem("data"));
-    if (data) {
-      setItems(
-        // каждый вызов функции ререндерит компонент, а каждый ререндер ререндерит компонент и т.д. до бесконечности. На помощь приходит useEffect
-        data.map((item) => ({
-          ...item,
-          date: new Date(item.date),
-        }))
-      );
-    }
-  }, []);
-  // Пустой массив зависимостей указывает, что useEffect не зависит от изменений каких-либо переменных или
-  // состояний, и должен быть вызван только при первом рендере компонента (монтировании).
-
-  useEffect(() => {
-    if (items.length) {
-      localStorage.setItem("data", JSON.stringify(items));
-    }
-  }, [items]);
+  const [items, setItems] = useLocalStorage('data');
 
   const addItem = (item) => {
-    setItems((oldItems) => [
-      ...oldItems, // создаем новый массив со всеми старыми items + новым item
+    setItems([...mapItems(items),
       {
         text: item.post,
         title: item.title,
         date: new Date(item.date),
-        id:
-          oldItems.length > 0 ? Math.max(...oldItems.map((i) => i.id)) + 1 : 1, // берем максимальный id из item`ов списка и прибавляем 1 (новый элемент)
+        id: items.length > 0 ? Math.max(...items.map((i) => i.id)) + 1 : 1, // берем максимальный id из item`ов списка и прибавляем 1 (новый элемент)
       },
     ]);
   };
@@ -52,7 +38,7 @@ function App() {
 
         <JournalAddButton></JournalAddButton>
 
-        <JournalList items={items}></JournalList>
+        <JournalList items={mapItems(items)}></JournalList>
       </LeftPanel>
       <Body>
         <JournalForm onSubmit={addItem}></JournalForm>{" "}
