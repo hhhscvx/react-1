@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import cn from "classnames";
 import styles from "./Input.module.css";
 import { forwardRef } from "react";

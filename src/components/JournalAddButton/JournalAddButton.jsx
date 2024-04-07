@@ -1,7 +1,7 @@
 import CardButton from "../CardButton/CardButton";
 import "./JournalAddButton.css";
 
-function JournalAddButton({ children }) {
+function JournalAddButton() {
 
   return (
     <CardButton className="journal-add">
