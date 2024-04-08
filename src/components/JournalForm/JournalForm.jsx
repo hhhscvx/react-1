@@ -7,7 +7,7 @@ import { INITIAL_STATE, formReducer } from "./JournalForm.state";
 import Input from "../Input/Input";
 import { UserContext } from "../../context/user.context";
 
-function JournalForm({ onSubmit }) {
+function JournalForm({ onSubmit, selectedItem, deleteItem }) {
   const [formState, dispatchForm] = useReducer(formReducer, INITIAL_STATE);
   const { isValid, isFormReadyToSubmit, values } = formState;
   const titleRef = useRef(); // useRef позволяет привязаться к определенному элементу
@@ -49,12 +49,27 @@ function JournalForm({ onSubmit }) {
     if (isFormReadyToSubmit) {
       onSubmit(values);
       dispatchForm({ type: "CLEAR" });
+      dispatchForm({ type: "SET_VALUE", payload: { userId } });
     }
-  }, [isFormReadyToSubmit, values, onSubmit]);
+  }, [isFormReadyToSubmit, values, onSubmit, userId]);
 
   useEffect(() => {
     dispatchForm({ type: "SET_VALUE", payload: { userId } });
   }, [userId]);
+
+  useEffect(() => {
+    if (!selectedItem) {
+      dispatchForm({ type: "CLEAR" });
+      dispatchForm({ type: "SET_VALUE", payload: { userId } });
+    }
+    dispatchForm({ type: "SET_VALUE", payload: { ...selectedItem } });
+  }, [selectedItem]);
+
+  const deleteJournalItem = () => {
+    deleteItem(selectedItem.id); // Помимо самого удаления надо очистить форму и задать что действия были произведены от request.user
+    dispatchForm({ type: "CLEAR" });
+    dispatchForm({ type: "SET_VALUE", payload: { userId } });
+  };
 
   const onChange = (event) => {
     dispatchForm({
@@ -86,23 +101,23 @@ function JournalForm({ onSubmit }) {
           appearence="title"
           isValid={isValid.title}
         />
-        <img src="/archive.svg" alt="Date" />
+        <span onClick={deleteJournalItem}>
+          <img
+            src="/trash.svg"
+            alt="Date"
+            className={styles['trash']}
+          />
+        </span>
       </div>
 
-      <div
-        className="divForm"
-        style={{
-          display: "flex",
-          alignItems: "center",
-          borderBottom: "3px solid #323232",
-          paddingBottom: "10px",
-        }}
-      >
+      <div className="divForm">
         <img src="/calendar.svg" alt="Date" />
         <label style={{ marginRight: "10px", marginLeft: "20px" }}>Дата</label>
         <Input
           type="date"
-          value={values.date}
+          value={
+            values.date ? new Date(values.date).toISOString().slice(0, 10) : ""
+          }
           onChange={onChange}
           ref={dateRef}
           name="date"
@@ -110,15 +125,7 @@ function JournalForm({ onSubmit }) {
         />
       </div>
 
-      <div
-        className="divForm"
-        style={{
-          display: "flex",
-          alignItems: "center",
-          borderBottom: "3px solid #323232",
-          paddingBottom: "10px",
-        }}
-      >
+      <div className="divForm">
         <img src="/folder.svg" alt="Date" />
         <label style={{ marginRight: "10px", marginLeft: "20px" }}>Метки</label>
         <Input type="text" name="tag" value={values.tag} onChange={onChange} />

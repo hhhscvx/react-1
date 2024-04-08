@@ -1,11 +1,9 @@
 import { memo } from "react";
 import "./Button.css";
 
-function Button({ children, onClick }) {
-  console.log("Button");
-
+function Button({ children }) {
   return (
-    <button className="button accent" onClick={onClick}>
+    <button className="button accent">
       {children}
     </button>
   );
