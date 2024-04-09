@@ -101,13 +101,11 @@ function JournalForm({ onSubmit, selectedItem, deleteItem }) {
           appearence="title"
           isValid={isValid.title}
         />
-        <span onClick={deleteJournalItem}>
-          <img
-            src="/trash.svg"
-            alt="Date"
-            className={styles['trash']}
-          />
-        </span>
+        {selectedItem?.id && (
+          <span onClick={deleteJournalItem}>
+            <img src="/trash.svg" alt="Date" className={styles["trash"]} />
+          </span>
+        )}
       </div>
 
       <div className="divForm">

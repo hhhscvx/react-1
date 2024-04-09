@@ -1,6 +1,7 @@
 /* eslint-disable react/prop-types */
 import { useContext } from "react";
 import { UserContext } from "../../context/user.context";
+import styles from './SelectUser.module.css'
 
 function SelectUser({ ref }) {
   const { userId, setUserId } = useContext(UserContext);
@@ -13,7 +14,7 @@ function SelectUser({ ref }) {
   };
 
   return (
-    <select name="user" id="user" ref={ref} value={userId} onChange={changeUser}>
+    <select className={styles['select']} name="user" id="user" ref={ref} value={userId} onChange={changeUser}>
       <option value="1">Вася</option>
       <option value="2">Серега пират</option>
     </select>

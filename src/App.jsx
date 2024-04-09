@@ -21,7 +21,7 @@ function mapItems(items) {
 
 function App() {
   const [items, setItems] = useLocalStorage("data");
-  const [selectedItem, setSelectedItem] = useState({});
+  const [selectedItem, setSelectedItem] = useState(null);
 
   const deleteItem = (id) => { // Оставляем в localStorage только те данные, id которых не равен тому, который удаляем, короче оставляем все кроме удаляемого потому что мы его удалили бля
     setItems([...items.filter((item) => item.id !== id)]);
@@ -60,7 +60,7 @@ function App() {
         <LeftPanel>
           <Header />
 
-          <JournalAddButton></JournalAddButton>
+          <JournalAddButton clearForm={() => setSelectedItem(null)}></JournalAddButton>
 
           <JournalList
             items={mapItems(items)}
